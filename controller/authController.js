@@ -11,7 +11,7 @@ const registerUser = (req, res) => {
     user.password = hash;
     Users.insert(user)
         .then(response => {
-            helper.sendStatus(201, response);
+            helper.sendStatus(201, response, res);
         })
         .catch(err => {
             helper.sendStatus(500, {Error: err.message}, res);
