@@ -6,7 +6,7 @@ const helper = require('../helperFunction');
 
 
 const getUsers = (req, res) => {
-    Users.find()
+    Users.findBy({department: req.user.department})
         .then(response => {
             helper.sendStatus(200, response, res);
         })
@@ -17,13 +17,19 @@ const getUsers = (req, res) => {
 
 const getUserById = (req, res) => {
     const { id } = req.params;
-    Users.findById(id)
+    const { department } = req.user;
+    Users.findById(id) 
         .then(response => {
-            helper.sendStatus(200, response, res);
+            if(response.department === department) {
+                helper.sendStatus(200, response, res);
+            } else {
+                helper.sendStatus(400, {Error: `id: ${id} does not exist in ${department}`}, res);
+            }
         })
         .catch(err => {
             helper.sendStatus(500, {Error: err.message}, res);
-        });
+        })
+    
 };
 
 const getUsersByDepartment = (req, res) => {
@@ -31,7 +37,6 @@ const getUsersByDepartment = (req, res) => {
     let division = department === "cs" ? "Computer Science" : department === "fs" ? "Web Development" : department === "ds" ? "Data Science" : department === "ios" ? "iOS" : department === "ux" || department === "ui" ? "UX": department === "labs" ? "Labs" : department === "x" ? "X" : "Android";
     Users.findBy({department: division})
         .then(response => {
-            console.log(department, response, "hello");
             helper.sendStatus(200, response, res);
         })
         .catch(err => {
